@@ -173,7 +173,7 @@ public class TicketMasterAPI {
 	}
 
 	
-	public JSONArray search(double lat, double lon, String keyword) {
+	public List<Item> search(double lat, double lon, String keyword) {
 		// Encode keyword in url since it may contain special characters
 		if (keyword == null) {
 			keyword= DEFAULT_KEYWORD;
@@ -210,24 +210,24 @@ public class TicketMasterAPI {
 			in.close();
 			JSONObject obj = new JSONObject(response.toString());
 			if (obj.isNull("_embedded")) {
-				return new JSONArray();
+				return new ArrayList<>();
 			}
 			JSONObject embedded = obj.getJSONObject("_embedded");
 			JSONArray events = embedded.getJSONArray("events");
-			return events;
+			return getItemList(events);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
- 		return new JSONArray();
+		return new ArrayList<>();
 	}
 
 	private void queryAPI(double lat, double lon) {
-		JSONArray events = search(lat, lon, null);
+		List<Item> itemList = search(lat, lon, null);
 		try {
-		    for (int i = 0; i < events.length(); i++) {
-		        JSONObject event = events.getJSONObject(i);
-		        System.out.println(event);
-		    }
+			for (Item item : itemList) {
+				JSONObject jsonObject = item.toJSONObject();
+				System.out.println(jsonObject);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
